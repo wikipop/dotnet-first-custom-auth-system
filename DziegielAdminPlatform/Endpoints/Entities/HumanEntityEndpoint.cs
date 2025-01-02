@@ -20,10 +20,10 @@ public static class HumanEntityEndpoint
     {
         db.HumanEntities.Add(humanEntity);
         db.SaveChanges();
-        return Results.Created($"/objects/{humanEntity.Id}", humanEntity);
+        return Results.Created($"/objects/{BasePath}/{humanEntity.Id}", humanEntity);
     }
     
-    private static IResult GetHuman(ApplicationDbContext db, int id)
+    private static IResult GetHuman(ApplicationDbContext db, int id)    
     {
         var humanEntity = db.HumanEntities.Find(id);
         return humanEntity is null ? Results.NotFound() : Results.Ok(humanEntity);

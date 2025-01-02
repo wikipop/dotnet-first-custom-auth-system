@@ -5,7 +5,7 @@ using IdentityUser = Microsoft.AspNetCore.Identity.IdentityUser;
 
 namespace DziegielAdminPlatform.Data;
 
-public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+public class ApplicationDbContext : IdentityDbContext<PlatformUser, PlatformRole, string>
 {
     public DbSet<HumanEntity> HumanEntities { get; set; }
     

@@ -1,5 +1,7 @@
 using DziegielAdminPlatform.Data;
 using DziegielAdminPlatform.Endpoints;
+using DziegielAdminPlatform.Extensions;
+using DziegielAdminPlatform.Models;
 using Microsoft.AspNetCore.Identity;
 using Scalar.AspNetCore;
 
@@ -9,13 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ApplicationDbContext>();
-builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddAuthServices();
 
 var app = builder.Build();
 
-app.MapIdentityApi<IdentityUser>();
+app.MapCustomIdentityApi<PlatformUser>();
+app.MapAdminEndpoint();
 app.MapEntitiesEndpoint();
 
 // Configure the HTTP request pipeline.
@@ -26,5 +27,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.SeedRoles();
+app.SeedUsers();
 
 app.Run();
