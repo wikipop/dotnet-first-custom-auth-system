@@ -5,13 +5,12 @@ using IdentityUser = Microsoft.AspNetCore.Identity.IdentityUser;
 
 namespace DziegielAdminPlatform.Data;
 
-public class ApplicationDbContext : IdentityDbContext<PlatformUser, PlatformRole, string>
+public class ApplicationDbContext: DbContext
 {
-    public DbSet<HumanEntity> HumanEntities { get; set; }
-    
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-    { }
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
+    public DbSet<HumanEntity> HumanEntities { get; set; }
+    public DbSet<PlatformUser> PlatformUsers { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlite("Data Source=app.db");
