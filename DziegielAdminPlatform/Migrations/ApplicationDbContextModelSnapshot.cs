@@ -46,6 +46,25 @@ namespace DziegielAdminPlatform.Migrations
                     b.ToTable("HumanEntities");
                 });
 
+            modelBuilder.Entity("DziegielAdminPlatform.Models.PlatformSession", b =>
+                {
+                    b.Property<Guid>("SessionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastAccessedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("SessionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PlatformSessions");
+                });
+
             modelBuilder.Entity("DziegielAdminPlatform.Models.PlatformUser", b =>
                 {
                     b.Property<Guid>("Id")
@@ -69,6 +88,17 @@ namespace DziegielAdminPlatform.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PlatformUsers");
+                });
+
+            modelBuilder.Entity("DziegielAdminPlatform.Models.PlatformSession", b =>
+                {
+                    b.HasOne("DziegielAdminPlatform.Models.PlatformUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

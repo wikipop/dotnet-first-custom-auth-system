@@ -1,3 +1,5 @@
 ﻿namespace DziegielAdminPlatform.Extensions;
 
-public static class InitialSeed { }
+public static class InitialSeed
+{
+}

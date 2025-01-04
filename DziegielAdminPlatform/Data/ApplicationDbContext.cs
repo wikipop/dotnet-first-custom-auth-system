@@ -1,16 +1,15 @@
 ﻿using DziegielAdminPlatform.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using IdentityUser = Microsoft.AspNetCore.Identity.IdentityUser;
 
 namespace DziegielAdminPlatform.Data;
 
-public class ApplicationDbContext: DbContext
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
-
     public DbSet<HumanEntity> HumanEntities { get; set; }
     public DbSet<PlatformUser> PlatformUsers { get; set; }
+
+    public DbSet<PlatformSession> PlatformSessions { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlite("Data Source=app.db");
