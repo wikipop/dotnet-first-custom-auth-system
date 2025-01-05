@@ -46,6 +46,21 @@ namespace DziegielAdminPlatform.Migrations
                     b.ToTable("HumanEntities");
                 });
 
+            modelBuilder.Entity("DziegielAdminPlatform.Models.PlatformRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlatformRoles");
+                });
+
             modelBuilder.Entity("DziegielAdminPlatform.Models.PlatformSession", b =>
                 {
                     b.Property<Guid>("SessionId")
@@ -90,6 +105,27 @@ namespace DziegielAdminPlatform.Migrations
                     b.ToTable("PlatformUsers");
                 });
 
+            modelBuilder.Entity("DziegielAdminPlatform.Models.UserRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UsersRoles");
+                });
+
             modelBuilder.Entity("DziegielAdminPlatform.Models.PlatformSession", b =>
                 {
                     b.HasOne("DziegielAdminPlatform.Models.PlatformUser", "User")
@@ -97,6 +133,25 @@ namespace DziegielAdminPlatform.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DziegielAdminPlatform.Models.UserRole", b =>
+                {
+                    b.HasOne("DziegielAdminPlatform.Models.PlatformRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DziegielAdminPlatform.Models.PlatformUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
 
                     b.Navigation("User");
                 });

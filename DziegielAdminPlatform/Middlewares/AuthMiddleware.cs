@@ -8,17 +8,7 @@ public static class AuthMiddlewareBuilderExtensions
     public static IApplicationBuilder UseAuth(this WebApplication app)
     {
         ArgumentNullException.ThrowIfNull(app);
-        
-        if(app.Environment.IsDevelopment())
-        {
-            return app.MapWhen(context => !context.Request.Path.StartsWithSegments(AuthEndpoint.BasePath) &&
-                                         !context.Request.Path.StartsWithSegments("/scalar") &&
-                                         !context.Request.Path.StartsWithSegments("/openapi"),
-                appBuilder => appBuilder.UseMiddleware<AuthMiddleware>());
-        }
-        
-        return app.MapWhen(context => !context.Request.Path.StartsWithSegments(AuthEndpoint.BasePath),
-            appBuilder => appBuilder.UseMiddleware<AuthMiddleware>());
+        return app.UseMiddleware<AuthMiddleware>();
     }
 }
 
@@ -38,16 +28,15 @@ public class AuthMiddleware
         if (context.Request.Cookies.TryGetValue("session", out var sessionId))
         {
             var session = await sessionManager.GetSessionAsync(Guid.Parse(sessionId));
+            session = await sessionManager.ValidateSessionAsync(session);
             
             if (session is not null)
             {
                 context.Items["session"] = session;
             }
 
-            await _next(context);
         }
         
-        context.Response.StatusCode = 401;
-        await context.Response.WriteAsync("Unauthorized");
+        await _next(context);
     }
 }

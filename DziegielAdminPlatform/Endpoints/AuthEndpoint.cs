@@ -15,6 +15,7 @@ public static class AuthEndpoint
 
         group.MapPost("/register", RegisterUserAsync);
         group.MapPost("/login", LoginUserAsync);
+        group.MapPost("/logout", LogoutUserAsync);
     }
 
     private static async Task<Results<Ok, ValidationProblem>> RegisterUserAsync(
@@ -45,8 +46,25 @@ public static class AuthEndpoint
 
         var session = await sessionManager.GetUserSessionAsync(user) ?? await sessionManager.CreateSessionAsync(user);
 
-        httpContext.Response.Cookies.Append("session", session.SessionId.ToString());
+        httpContext.Response.Cookies.Append("session", session.SessionId.ToString(), new CookieOptions(){
+            IsEssential = true,
+            HttpOnly = true,
+        });
 
         return TypedResults.Ok();
+    }
+    
+    private static async Task<Results<Ok, UnauthorizedHttpResult>> LogoutUserAsync(
+        ISessionManager sessionManager,
+        HttpContext httpContext)
+    {
+        if (httpContext.Items.TryGetValue("session", out var sessionObj) && sessionObj is PlatformSession session)
+        {
+            await sessionManager.DeleteSessionAsync(session);
+            httpContext.Response.Cookies.Delete("session");
+            return TypedResults.Ok();
+        }
+        
+        return TypedResults.Unauthorized();
     }
 }
