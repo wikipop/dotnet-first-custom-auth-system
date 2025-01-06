@@ -25,12 +25,11 @@ public class PlatformUser<TKey> where TKey : IEquatable<TKey>
     }
 
     public virtual TKey Id { get; set; }
-
     public virtual string UserName { get; set; }
-
     public virtual string PasswordHash { get; set; }
-
-    public virtual bool LockoutEnabled { get; set; }
-
-    public virtual int AccessFailedCount { get; set; }
+    public virtual ICollection<PlatformRole> Roles { get; set; } = new List<PlatformRole>();
+    
+    public virtual bool? LockoutEnabled { get; set; }
+    
+    public virtual int? AccessFailedCount { get; set; }
 }

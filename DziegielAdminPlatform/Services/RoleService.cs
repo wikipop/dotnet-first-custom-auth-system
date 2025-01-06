@@ -19,6 +19,11 @@ public class RoleService(ApplicationDbContext context) : IRoleService
         return await _context.PlatformRoles.FirstOrDefaultAsync(r => r.Name == roleName);
     }
 
+    public Task<List<PlatformRole>> GetRolesAsync()
+    {
+        return _context.PlatformRoles.ToListAsync();
+    }
+
     public Task AddUserToRoleAsync(PlatformUser user, PlatformRole role)
     {
         var userRole = new UserRole()

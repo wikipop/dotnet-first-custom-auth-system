@@ -23,12 +23,17 @@ public class UserService(ApplicationDbContext context, IPasswordStore passwordSt
 
         return _passwordStore.VerifyHashedPassword(user, user.PasswordHash, password);
     }
-
+    
     public async Task<PlatformUser?> GetUserAsync(string userName)
     {
         return await _context.PlatformUsers.FirstOrDefaultAsync(u => u.UserName == userName);
     }
 
+    public async Task<IEnumerable<PlatformUser>> GetUsersWithRolesAsync()
+    {
+        return await _context.PlatformUsers.Include(u => u.Roles).ToListAsync();
+    }
+    
     public async Task<PlatformUser?> GetUserAsync(Guid userId)
     {
         return await _context.PlatformUsers.FirstOrDefaultAsync(u => u.Id == userId);

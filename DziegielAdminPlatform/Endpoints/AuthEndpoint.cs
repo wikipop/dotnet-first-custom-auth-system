@@ -32,17 +32,23 @@ public static class AuthEndpoint
         return TypedResults.Ok();
     }
 
-    private static async Task<Results<Ok, UnauthorizedHttpResult, InternalServerError>> LoginUserAsync(
+    private static async Task<Results<ProblemHttpResult, Ok>> LoginUserAsync(
         IUserService userService,
         ISessionManager sessionManager,
         HttpContext httpContext,
         LoginRequest login)
     {
         if (await userService.ValidateUserAsync(login.UserName, login.Password) == PasswordVerificationResult.Failed)
-            return TypedResults.Unauthorized();
-
+            return PlatformHttpErrors.PlatformLoginValidationError();
+        
+        if (httpContext.Items.TryGetValue("session", out var sessionObj) && sessionObj is PlatformSession currentSession)
+        {
+            await sessionManager.DeleteSessionAsync(currentSession);
+            httpContext.Response.Cookies.Delete("session");
+        }
+        
         var user = await userService.GetUserAsync(login.UserName);
-        if (user is null) return TypedResults.InternalServerError();
+        if (user is null) return PlatformHttpErrors.PlatformLoginValidationError();
 
         var session = await sessionManager.GetUserSessionAsync(user) ?? await sessionManager.CreateSessionAsync(user);
 
@@ -54,7 +60,7 @@ public static class AuthEndpoint
         return TypedResults.Ok();
     }
     
-    private static async Task<Results<Ok, UnauthorizedHttpResult>> LogoutUserAsync(
+    private static async Task<Results<Ok, ProblemHttpResult>> LogoutUserAsync(
         ISessionManager sessionManager,
         HttpContext httpContext)
     {
@@ -65,6 +71,6 @@ public static class AuthEndpoint
             return TypedResults.Ok();
         }
         
-        return TypedResults.Unauthorized();
+        return PlatformHttpErrors.PlatformUserNotAuthenticatedError();
     }
 }

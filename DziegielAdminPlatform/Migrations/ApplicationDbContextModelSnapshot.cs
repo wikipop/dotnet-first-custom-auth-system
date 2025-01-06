@@ -56,7 +56,12 @@ namespace DziegielAdminPlatform.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("PlatformUserId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PlatformUserId");
 
                     b.ToTable("PlatformRoles");
                 });
@@ -86,10 +91,10 @@ namespace DziegielAdminPlatform.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("AccessFailedCount")
+                    b.Property<int?>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("LockoutEnabled")
+                    b.Property<bool?>("LockoutEnabled")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("PasswordHash")
@@ -126,6 +131,13 @@ namespace DziegielAdminPlatform.Migrations
                     b.ToTable("UsersRoles");
                 });
 
+            modelBuilder.Entity("DziegielAdminPlatform.Models.PlatformRole", b =>
+                {
+                    b.HasOne("DziegielAdminPlatform.Models.PlatformUser", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("PlatformUserId");
+                });
+
             modelBuilder.Entity("DziegielAdminPlatform.Models.PlatformSession", b =>
                 {
                     b.HasOne("DziegielAdminPlatform.Models.PlatformUser", "User")
@@ -154,6 +166,11 @@ namespace DziegielAdminPlatform.Migrations
                     b.Navigation("Role");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DziegielAdminPlatform.Models.PlatformUser", b =>
+                {
+                    b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618
         }

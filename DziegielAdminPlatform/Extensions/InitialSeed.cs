@@ -41,7 +41,6 @@ public static class InitialSeed
     {
         var userManager = sp.GetRequiredService<IUserService>();
         var roleManager = sp.GetRequiredService<IRoleService>();
-        var passwordStore = sp.GetRequiredService<IPasswordStore>();
 
         if (await userManager.GetUserAsync("admin") == null)
         {

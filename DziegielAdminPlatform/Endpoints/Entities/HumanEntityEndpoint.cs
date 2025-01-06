@@ -23,7 +23,7 @@ public static class HumanEntityEndpoint
         return Results.Created($"/objects/{BasePath}/{humanEntity.Id}", humanEntity);
     }
 
-    private static IResult GetHuman(ApplicationDbContext db, int id)
+    private static IResult GetHuman(ApplicationDbContext db, Guid id)
     {
         var humanEntity = db.HumanEntities.Find(id);
         return humanEntity is null ? Results.NotFound() : Results.Ok(humanEntity);

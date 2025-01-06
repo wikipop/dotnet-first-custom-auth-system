@@ -23,7 +23,7 @@ public class UserAccessFilter : IEndpointFilter
         
         if (session == null)
         {
-            return TypedResults.Unauthorized();
+            return PlatformHttpErrors.PlatformUserNotAuthenticatedError();
         }
         
         var user = await userService.GetUserAsync(session.UserId);
@@ -40,7 +40,7 @@ public class UserAccessFilter : IEndpointFilter
         }
         else
         {
-            return TypedResults.Forbid();
+            return PlatformHttpErrors.UserNotAuthorizedError();
         }
     }
 }
