@@ -1,8 +1,8 @@
-﻿using DziegielAdminPlatform.Data;
+﻿using DziegielAdminPlatform.Middlewares;
 using DziegielAdminPlatform.Models;
-using Microsoft.AspNetCore.Http.Metadata;
+using DziegielAdminPlatform.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace DziegielAdminPlatform.Endpoints;
 
@@ -10,19 +10,19 @@ public static class AdminEndpoint
 {
     public static void MapAdminEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        var group = endpoints.MapGroup("/admin").RequireAuthorization("Admin");
-        
+        var group = endpoints.MapGroup("/admin").AddEndpointFilter(new UserAccessFilter("Admin"));
+
         group.MapGet("/roles", GetRoles);
-        
+        group.MapGet("/users", GetUsers);
     }
 
-    private static IResult GetRoles([FromServices] IServiceProvider sp)
+    private static async Task<Ok<List<PlatformRole>>> GetRoles(IRoleService roleService)
     {
-        var roleManager = sp.GetRequiredService<RoleManager<IdentityRole>>();
-        var roles = roleManager.Roles.ToList();
-        return Results.Ok(roles);
+        return TypedResults.Ok(await roleService.GetRolesAsync());
     }
     
-    [AttributeUsage(AttributeTargets.Parameter)]
-    private sealed class FromServicesAttribute : Attribute, IFromServiceMetadata {}
+    private static async Task<Ok<IEnumerable<PlatformUser>>> GetUsers(IUserService userService)
+    {
+        return TypedResults.Ok(await userService.GetUsersWithRolesAsync());
+    }
 }

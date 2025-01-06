@@ -1,49 +1,56 @@
 ﻿using DziegielAdminPlatform.Models;
+using DziegielAdminPlatform.Services;
 using Microsoft.AspNetCore.Identity;
 
-namespace DziegielAdminPlatform.Data;
+namespace DziegielAdminPlatform.Extensions;
+
+public static class InitialSeedExtensions
+{
+    public static async Task SeedDziegielPlatform (this IApplicationBuilder builder)
+    {
+        using var scope = builder.ApplicationServices.CreateScope();
+        await InitialSeed.SeedRoles(scope.ServiceProvider);
+        await InitialSeed.SeedUsers(scope.ServiceProvider);
+    }
+}
 
 public static class InitialSeed
 {
-    public static void SeedRoles(this WebApplication app)
+    public static async Task SeedRoles(IServiceProvider sp)
     {
-        using (var scope = app.Services.CreateScope())
+        var roleManager = sp.GetRequiredService<IRoleService>();
+        
+        if (!await roleManager.RoleExistsAsync("Admin"))
         {
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<PlatformRole>>();
-            var roles = new[] { "Admin", "User" };
-            foreach (var role in roles)
+            await roleManager.CreateRoleAsync(new PlatformRole()
             {
-                if (!roleManager.RoleExistsAsync(role).Result)
-                {
-                    roleManager.CreateAsync(new PlatformRole(role)).Wait();
-                }
-            }
+                Name = "Admin"
+            });
+        }
+        
+        if (!await roleManager.RoleExistsAsync("User"))
+        {
+            await roleManager.CreateRoleAsync(new PlatformRole()
+            {
+                Name = "User"
+            });
         }
     }
 
-    public static void SeedUsers(this WebApplication app)
+    public static async Task SeedUsers(IServiceProvider sp)
     {
-        using (var scope = app.Services.CreateScope())
-        {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<PlatformUser>>();
-            var user = new PlatformUser { UserName = "wikipopxyz@gmail.com", Email = "wikipopxyz@gmail.com" };
+        var userManager = sp.GetRequiredService<IUserService>();
+        var roleManager = sp.GetRequiredService<IRoleService>();
 
-            if (userManager.FindByNameAsync(user.UserName).Result == null)
+        if (await userManager.GetUserAsync("admin") == null)
+        {
+            var user = new PlatformUser()
             {
-                Console.WriteLine("Enter password for admin user:");
-                
-                string password = null;
-                while (true)
-                {
-                    var key = System.Console.ReadKey(true);
-                    if (key.Key == ConsoleKey.Enter)
-                        break;
-                    password += key.KeyChar;
-                }
-                
-                userManager.CreateAsync(user, password!).Wait();
-                userManager.AddToRoleAsync(user, "Admin").Wait();
-            }
+                UserName = "admin"
+            };
+            
+            await userManager.RegisterUserAsync(user, "0S81uUgwRKmNdGGghL40KOW7j");
+            await roleManager.AddUserToRoleAsync(user, (await roleManager.GetRoleAsync("Admin"))!);
         }
     }
 }

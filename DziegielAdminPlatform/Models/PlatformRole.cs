@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DziegielAdminPlatform.Models;
 
-public class PlatformRole : IdentityRole
+public class PlatformRole
 {
-    public PlatformRole(string name) : base(name) {}
-} 
+    [Key]
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+}
